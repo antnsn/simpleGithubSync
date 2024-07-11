@@ -1,4 +1,3 @@
-
 # Simple GitHub Sync
 
 This project provides a Docker container that monitors multiple directories for changes and syncs them with a remote Git repository. The container periodically checks for changes in the local directories and the remote repository, ensuring both are in sync.
@@ -21,22 +20,22 @@ This project provides a Docker container that monitors multiple directories for 
 
 ### Using the Pre-built Image
 
-The Docker image for this project is available on GitHub Container Registry (GHCR) with the `latest` tag.
+The Docker image for this project is available on GitHub Container Registry (GHCR) with the `main` tag.
 
 ### Running with `docker run`
 
-Run the Docker container with the following environment variables:
+Run the Docker container with the following volumes:
 
-- `SSH_KEY`: Your private SSH key for authentication with the Git repository.
+- Mount the SSH key and known hosts file to the container.
+- Mount the directories you want to monitor to `/repos`.
 
 Example command:
 
 ```sh
 docker run -d \
-    -e SSH_KEY="$(cat /path/to/private_key)" \
-    -v /path/to/dir1:/repos/dir1 \
-    -v /path/to/dir2:/repos/dir2 \
-    ghcr.io/USERNAME/simplegithubsync:latest
+    -v /path/to/your/.ssh:/root/.ssh \
+    -v /path/to/your/repo1:/repos/repo1 \
+    ghcr.io/antnsn/simplegithubsync:main
 ```
 
 ### Running with `docker-compose`
@@ -44,22 +43,16 @@ docker run -d \
 Create a `docker-compose.yml` file in your project directory:
 
 ```yaml
-version: '3.8'
+version: "3.9"
 
 services:
-  simple-github-sync:
-    image: ghcr.io/USERNAME/simplegithubsync:latest
-    environment:
-      - SSH_KEY=${SSH_KEY}
+  simplegithubsync:
+    container_name: githubSync
     volumes:
-      - path/to/dir1:/repos/dir1
-      - /path/to/dir2:/repos/dir2
-```
-
-Create a `.env` file in the same directory to securely pass your SSH key:
-
-```dotenv
-SSH_KEY=$(cat /path/to/private_key)
+      - /path/to/your/.ssh:/root/.ssh
+      - /path/to/your/repo1:/repos/repo1
+      - /path/to/your/repo2:/repos/repo2
+    image: ghcr.io/antnsn/simplegithubsync:main
 ```
 
 Run the Docker Compose setup:
@@ -70,7 +63,7 @@ docker-compose up -d
 
 ### Environment Variables
 
-- `SSH_KEY`: The private SSH key for accessing your Git repository. This key should be provided as a single string.
+This setup does not require environment variables for the SSH key because the key is mounted directly as a volume.
 
 ### How It Works
 
@@ -92,10 +85,13 @@ docker-compose up -d
 - Check the logs of the Docker container for any error messages:
 
   ```sh
-  docker logs <container_id>
+  docker logs githubSync
   ```
 
 ### License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
+---
+
+This `README.md` provides clear instructions for running the Docker container using the pre-built image from GHCR with the `main` tag and dynamically using all mounted volumes as Git repository paths, with generic paths for easier adaptation.
