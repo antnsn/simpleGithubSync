@@ -12,7 +12,8 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # Convert the repository name to lowercase
+  IMAGE_NAME: ${{ github.repository | toLowerCase }}
 
 jobs:
   build:
