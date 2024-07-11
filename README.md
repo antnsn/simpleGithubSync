@@ -1,6 +1,3 @@
-### README.md
-
-```markdown
 # Simple GitHub Sync
 
 This project provides a simple solution to sync multiple Git repositories using Docker. It periodically fetches, pulls, commits, and pushes changes to ensure all repositories are up-to-date.
