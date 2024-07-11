@@ -1,4 +1,8 @@
 
+<p align="center">
+  <img width=30%; src="./assets/logo.png">
+</p>
+
 # Simple GitHub Sync
 
 A simple and efficient solution to synchronize multiple Git repositories using Docker. This container periodically fetches, pulls, commits, and pushes changes to ensure your repositories are always up-to-date.
