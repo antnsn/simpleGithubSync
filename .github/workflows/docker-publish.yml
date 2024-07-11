@@ -48,7 +48,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch,pattern=main
+            type=ref,event=branch,pattern=main,latest=true
             type=ref,event=tag,pattern=v*.*.*
             type=schedule,pattern='37 23 * * *'
 
