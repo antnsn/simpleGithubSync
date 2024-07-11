@@ -19,14 +19,15 @@ RUN go build -o main .
 # Use a minimal image as the base image for the final stage
 FROM alpine:latest
 
-# Install git and openssh
-RUN apk add --no-cache git openssh
+# Install git, openssh, and tzdata for timezone settings
+RUN apk add --no-cache git openssh tzdata
+
+# Set timezone using environment variable
+ENV TZ=""
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Create a directory for mounting volumes
 RUN mkdir /repos
-
-# Set environment variables for SSH key
-ENV SSH_KEY=""
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main /usr/local/bin/main

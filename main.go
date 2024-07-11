@@ -87,7 +87,13 @@ func syncRepo(repoDir string) {
         return
     }
 
-    cmd = exec.Command("git", "commit", "-m", fmt.Sprintf("Automated commit %s", time.Now().Format("2006-01-02 15:04:05")))
+    // Use the configured timezone for commit messages
+    loc, err := time.LoadLocation(os.Getenv("TZ"))
+    if err != nil {
+        log.Printf("Failed to load location: %v", err)
+        loc = time.UTC
+    }
+    cmd = exec.Command("git", "commit", "-m", fmt.Sprintf("Automated commit %s", time.Now().In(loc).Format("2006-01-02 15:04:05")))
     cmd.Dir = repoDir
     if err := cmd.Run(); err != nil {
         log.Printf("No changes to commit in %s", repoDir)

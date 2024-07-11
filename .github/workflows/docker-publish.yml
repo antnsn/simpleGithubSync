@@ -2,7 +2,7 @@ name: Docker
 
 on:
   schedule:
-    - cron: '37 23 * * *'
+    - cron: '27 8 * * *'
   push:
     branches: [ "main" ]
     tags: [ 'v*.*.*' ]  # Publish semver tags as releases.
@@ -10,7 +10,9 @@ on:
     branches: [ "main" ]
 
 env:
-  REGISTRY: ghcr.io  # Use docker.io for Docker Hub if empty
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -50,7 +52,6 @@ jobs:
           tags: |
             type=ref,event=branch,pattern=main,latest=true
             type=ref,event=tag,pattern=v*.*.*
-            type=schedule,pattern='37 23 * * *'
 
       - name: Build and push Docker image
         id: build-and-push
