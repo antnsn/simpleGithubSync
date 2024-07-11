@@ -4,14 +4,13 @@ FROM golang:1.18-alpine AS builder
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy the Go Modules manifests
-# COPY go.mod go.sum ./
+# Copy the Go Modules manifest
 COPY go.mod ./
 
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+# Download all dependencies. Dependencies will be cached if the go.mod file is not changed
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
+# Copy the source code from the current directory to the Working Directory inside the container
 COPY . .
 
 # Build the Go app
@@ -29,6 +28,12 @@ ENV FOLDER_PATHS="" \
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main /usr/local/bin/main
+
+# Create the .ssh directory
+RUN mkdir -p /root/.ssh
+
+# Set permissions for the .ssh directory
+RUN chmod 700 /root/.ssh
 
 # Run the binary program produced by `go build`
 ENTRYPOINT ["/usr/local/bin/main"]
