@@ -49,8 +49,9 @@ func setupSSH() error {
 func syncRepo(repoDir string) {
     cmd := exec.Command("git", "fetch", "origin")
     cmd.Dir = repoDir
-    if err := cmd.Run(); err != nil {
-        log.Printf("Failed to fetch in %s: %v", repoDir, err)
+    output, err := cmd.CombinedOutput()
+    if err != nil {
+        log.Printf("Failed to fetch in %s: %v. Output: %s", repoDir, err, string(output))
         return
     }
 
@@ -74,20 +75,21 @@ func syncRepo(repoDir string) {
         log.Printf("Remote changes detected in %s. Pulling changes...", repoDir)
         cmd := exec.Command("git", "pull", "origin", "main")
         cmd.Dir = repoDir
-        if err := cmd.Run(); err != nil {
-            log.Printf("Failed to pull in %s: %v", repoDir, err)
+        output, err := cmd.CombinedOutput()
+        if err != nil {
+            log.Printf("Failed to pull in %s: %v. Output: %s", repoDir, err, string(output))
             return
         }
     }
 
     cmd = exec.Command("git", "add", ".")
     cmd.Dir = repoDir
-    if err := cmd.Run(); err != nil {
-        log.Printf("Failed to add changes in %s: %v", repoDir, err)
+    output, err = cmd.CombinedOutput()
+    if err != nil {
+        log.Printf("Failed to add changes in %s: %v. Output: %s", repoDir, err, string(output))
         return
     }
 
-    // Use the configured timezone for commit messages
     loc, err := time.LoadLocation(os.Getenv("TZ"))
     if err != nil {
         log.Printf("Failed to load location: %v", err)
@@ -95,20 +97,24 @@ func syncRepo(repoDir string) {
     }
     cmd = exec.Command("git", "commit", "-m", fmt.Sprintf("Automated commit %s", time.Now().In(loc).Format("2006-01-02 15:04:05")))
     cmd.Dir = repoDir
-    if err := cmd.Run(); err != nil {
-        log.Printf("No changes to commit in %s", repoDir)
+    output, err = cmd.CombinedOutput()
+    if err != nil {
+        log.Printf("No changes to commit in %s: %v. Output: %s", repoDir, err, string(output))
         return
     }
 
     cmd = exec.Command("git", "push", "origin", "main")
     cmd.Dir = repoDir
-    if err := cmd.Run(); err != nil {
-        log.Printf("Failed to push in %s: %v", repoDir, err)
+    output, err = cmd.CombinedOutput()
+    if err != nil {
+        log.Printf("Failed to push in %s: %v. Output: %s", repoDir, err, string(output))
         return
     }
 
     log.Printf("Successfully synced %s", repoDir)
 }
+
+
 
 func main() {
     err := setupSSH()
