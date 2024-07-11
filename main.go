@@ -2,11 +2,12 @@ package main
 
 import (
     "fmt"
-    "log"
-    "os/exec"
-    "time"
     "io/ioutil"
+    "log"
+    "os"
+    "os/exec"
     "path/filepath"
+    "time"
 )
 
 // Function to get mounted volumes
@@ -22,6 +23,39 @@ func getMountedVolumes() ([]string, error) {
         }
     }
     return volumes, nil
+}
+
+func setupSSH() error {
+    sshKey := os.Getenv("SSH_KEY")
+    if sshKey == "" {
+        return fmt.Errorf("SSH_KEY environment variable not set")
+    }
+
+    sshDir := "/root/.ssh"
+    err := os.MkdirAll(sshDir, 0700)
+    if err != nil {
+        return fmt.Errorf("failed to create .ssh directory: %v", err)
+    }
+
+    keyPath := filepath.Join(sshDir, "id_rsa")
+    err = ioutil.WriteFile(keyPath, []byte(sshKey), 0600)
+    if err != nil {
+        return fmt.Errorf("failed to write SSH key: %v", err)
+    }
+
+    // Add GitHub to known hosts to avoid manual fingerprint verification
+    knownHostsCmd := exec.Command("ssh-keyscan", "github.com")
+    knownHosts, err := knownHostsCmd.Output()
+    if err != nil {
+        return fmt.Errorf("failed to scan GitHub SSH keys: %v", err)
+    }
+
+    err = ioutil.WriteFile(filepath.Join(sshDir, "known_hosts"), knownHosts, 0600)
+    if err != nil {
+        return fmt.Errorf("failed to write known_hosts file: %v", err)
+    }
+
+    return nil
 }
 
 func syncRepo(repoDir string) {
@@ -83,12 +117,17 @@ func syncRepo(repoDir string) {
 }
 
 func main() {
+    err := setupSSH()
+    if err != nil {
+        log.Fatalf("SSH setup failed: %v", err)
+    }
+
     for {
         repoDirs, err := getMountedVolumes()
         if err != nil {
             log.Fatalf("Failed to get mounted volumes: %v", err)
         }
-        
+
         for _, repoDir := range repoDirs {
             syncRepo(repoDir)
         }
