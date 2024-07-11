@@ -1,20 +1,47 @@
+
 # Simple GitHub Sync
 
-This project provides a simple solution to sync multiple Git repositories using Docker. It periodically fetches, pulls, commits, and pushes changes to ensure all repositories are up-to-date.
+![GitHub last commit](https://img.shields.io/github/last-commit/antnsn/simpleGithubSync)
+![Docker Image Version (latest by date)](https://img.shields.io/docker/v/ghcr.io/antnsn/simplegithubsync?sort=date)
+![Docker Pulls](https://img.shields.io/docker/pulls/ghcr.io/antnsn/simplegithubsync)
+![License](https://img.shields.io/github/license/antnsn/simpleGithubSync)
 
-## Usage
+A simple and efficient solution to synchronize multiple Git repositories using Docker. This container periodically fetches, pulls, commits, and pushes changes to ensure your repositories are always up-to-date.
+
+## 📋 Prerequisites
+
+Before you get started, ensure you have the following:
+
+1. **Docker**: Install Docker on your system. Refer to the [Docker installation guide](https://docs.docker.com/get-docker/) for instructions.
+
+2. **SSH Keys**: Generate SSH keys if you don't have them already. You can generate SSH keys using the following command:
+
+    ```sh
+    ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    ```
+
+    - Follow the prompts to save the key in the default location (`/home/your_user/.ssh/id_rsa`).
+    - Add the SSH key to your GitHub account. Follow the instructions [here](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh).
+
+3. **Git Configuration**: Ensure you have a `.gitconfig` file in your home directory with the following details:
+
+    ```ini
+    [user]
+        email = your_email@example.com
+        name = Your Name
+    ```
+
+    This configuration allows Git to recognize your commits with the correct user information.
+
+4. **Pre-existing Git Repositories**: This tool is designed to sync pre-existing Git repositories. Ensure your repositories are cloned and available on your local system.
+
+## 🚀 Usage
 
 To use this Docker container, follow the steps below:
 
-### Prerequisites
-
-- Docker installed on your system.
-- SSH keys set up for GitHub access.
-- `.gitconfig` file configured with your Git user name and email.
-
 ### Docker Compose Configuration
 
-Here is an example of a `docker-compose.yml` configuration:
+Here's an example `docker-compose.yml` configuration:
 
 ```yaml
 version: "3.9"
@@ -28,13 +55,13 @@ services:
       - /path/to/your/home:/root
       - /path/to/repo/repo1:/repos/repo1
       - /path/to/repo/repo2:/repos/repo2
-    image: ghcr.io/antnsn/simplegithubsync:v1.0.3
+    image: ghcr.io/antnsn/simplegithubsync:latest
 networks: {}
 ```
 
 ### Docker Run Command
 
-If you prefer to use `docker run` instead of Docker Compose, you can use the following command:
+Alternatively, you can run the container using `docker run`:
 
 ```sh
 docker run -d \
@@ -44,29 +71,29 @@ docker run -d \
   -v /path/to/your/home:/root \
   -v /path/to/repo/repo1:/repos/repo1 \
   -v /path/to/repo/repo2:/repos/repo2 \
-  ghcr.io/antnsn/simplegithubsync:v1.0.3
+  ghcr.io/antnsn/simplegithubsync:latest
 ```
 
-### Configuration
+### Configuration Details
 
-1. **SSH Keys**: Mount your SSH keys directory to `/root/.ssh` inside the container. Ensure your SSH keys have the correct permissions.
+1. **SSH Keys**: Mount your SSH keys directory to `/root/.ssh` inside the container to ensure Git can authenticate with GitHub.
 
-   ```yaml
-   - /path/to/your/.ssh:/root/.ssh
-   ```
+    ```yaml
+    - /path/to/your/.ssh:/root/.ssh
+    ```
 
-2. **Git Configuration**: Mount your home directory containing the `.gitconfig` file to `/root` inside the container.
+2. **Git Configuration**: Mount your home directory containing the `.gitconfig` file to `/root` inside the container for Git user configuration.
 
-   ```yaml
-   - /path/to/your/home:/root
-   ```
+    ```yaml
+    - /path/to/your/home:/root
+    ```
 
-3. **Repositories**: Mount each of your Git repositories to `/repos` inside the container. Each repository should be in its own directory.
+3. **Repositories**: Mount each of your Git repositories to `/repos` inside the container, ensuring each repository is in its own directory.
 
-   ```yaml
-   - /path/to/repo/repo1:/repos/repo1
-   - /path/to/repo/repo2:/repos/repo2
-   ```
+    ```yaml
+    - /path/to/repo/repo1:/repos/repo1
+    - /path/to/repo/repo2:/repos/repo2
+    ```
 
 ### Running the Container
 
@@ -76,15 +103,13 @@ To run the container using Docker Compose, navigate to the directory containing 
 docker-compose up -d
 ```
 
-This will start the `simplegithubsync` container in detached mode. The container will periodically sync your repositories according to the script logic.
+To run the container using `docker run`, use the command provided above.
 
-To run the container using `docker run`, execute the command provided in the Docker Run Command section.
-
-### Environment Variables
+### 🌍 Environment Variables
 
 - `TZ`: Set the timezone for the container (e.g., `Europe/Oslo`).
 
-### Logging
+### 📖 Logging
 
 Logs for the synchronization process will be available in the Docker container's logs. You can view them using:
 
@@ -92,10 +117,14 @@ Logs for the synchronization process will be available in the Docker container's
 docker logs -f githubSync
 ```
 
-### Contributing
+## 🤝 Contributing
 
 Feel free to open issues or submit pull requests if you have suggestions for improvements or bug fixes.
 
-### License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+Happy syncing! 🚀
