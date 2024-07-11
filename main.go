@@ -46,24 +46,6 @@ func setupSSH() error {
     return nil
 }
 
-func setupGitConfig() error {
-    // Ensure that the .gitconfig file is linked to the correct location
-    homeDir := "/var/services/homes/plecto"
-    gitConfigSource := filepath.Join(homeDir, ".gitconfig")
-    gitConfigDest := "/root/.gitconfig"
-
-    if _, err := os.Stat(gitConfigSource); os.IsNotExist(err) {
-        return fmt.Errorf(".gitconfig file not found in %s", homeDir)
-    }
-
-    // Copy or symlink the .gitconfig file to the appropriate location
-    if err := os.Symlink(gitConfigSource, gitConfigDest); err != nil {
-        return fmt.Errorf("failed to symlink .gitconfig: %v", err)
-    }
-
-    return nil
-}
-
 func syncRepo(repoDir string) {
     // Mark the directory as safe for Git
     configCmd := exec.Command("git", "config", "--global", "--add", "safe.directory", repoDir)
@@ -143,11 +125,6 @@ func main() {
     err := setupSSH()
     if err != nil {
         log.Fatalf("SSH setup failed: %v", err)
-    }
-
-    err = setupGitConfig()
-    if err != nil {
-        log.Fatalf("Git config setup failed: %v", err)
     }
 
     for {
