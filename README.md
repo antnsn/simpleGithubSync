@@ -1,11 +1,6 @@
 
 # Simple GitHub Sync
 
-![GitHub last commit](https://img.shields.io/github/last-commit/antnsn/simpleGithubSync)
-![Docker Image Version (latest by date)](https://img.shields.io/docker/v/ghcr.io/antnsn/simplegithubsync?sort=date)
-![Docker Pulls](https://img.shields.io/docker/pulls/ghcr.io/antnsn/simplegithubsync)
-![License](https://img.shields.io/github/license/antnsn/simpleGithubSync)
-
 A simple and efficient solution to synchronize multiple Git repositories using Docker. This container periodically fetches, pulls, commits, and pushes changes to ensure your repositories are always up-to-date.
 
 ## 📋 Prerequisites
