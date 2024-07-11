@@ -23,7 +23,7 @@ FROM alpine:latest
 RUN apk add --no-cache git openssh
 
 # Create a directory for mounting volumes
-RUN mkdir /mnt
+RUN mkdir /repos
 
 # Set environment variables for SSH key
 ENV SSH_KEY=""

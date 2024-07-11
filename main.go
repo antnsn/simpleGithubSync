@@ -14,13 +14,13 @@ import (
 // Function to get mounted volumes
 func getMountedVolumes() ([]string, error) {
     var volumes []string
-    files, err := ioutil.ReadDir("/mnt")
+    files, err := ioutil.ReadDir("/repos")
     if err != nil {
         return nil, err
     }
     for _, file := range files {
         if file.IsDir() {
-            volumes = append(volumes, filepath.Join("/mnt", file.Name()))
+            volumes = append(volumes, filepath.Join("/repos", file.Name()))
         }
     }
     return volumes, nil

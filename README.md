@@ -34,8 +34,8 @@ Example command:
 ```sh
 docker run -d \
     -e SSH_KEY="$(cat /path/to/private_key)" \
-    -v /path/to/dir1:/mnt/dir1 \
-    -v /path/to/dir2:/mnt/dir2 \
+    -v /path/to/dir1:/repos/dir1 \
+    -v /path/to/dir2:/repos/dir2 \
     ghcr.io/USERNAME/simplegithubsync:latest
 ```
 
@@ -52,8 +52,8 @@ services:
     environment:
       - SSH_KEY=${SSH_KEY}
     volumes:
-      - path/to/dir1:/mnt/dir1
-      - /path/to/dir2:/mnt/dir2
+      - path/to/dir1:/repos/dir1
+      - /path/to/dir2:/repos/dir2
 ```
 
 Create a `.env` file in the same directory to securely pass your SSH key:
@@ -75,7 +75,7 @@ docker-compose up -d
 ### How It Works
 
 1. The entrypoint script sets up the SSH key for authentication.
-2. The script lists all directories mounted to `/mnt` and uses them as Git repository paths.
+2. The script lists all directories mounted to `/repos` and uses them as Git repository paths.
 3. If changes are detected locally, it adds, commits, and pushes the changes to the remote repository.
 4. If changes are detected in the remote repository, it pulls the updates to the local directories.
 5. The script runs in an infinite loop, checking for changes every 60 seconds.
@@ -88,7 +88,7 @@ docker-compose up -d
   chmod 600 /path/to/your/private/key
   ```
 
-- Verify that the directories mounted to `/mnt` exist and are accessible.
+- Verify that the directories mounted to `/repos` exist and are accessible.
 - Check the logs of the Docker container for any error messages:
 
   ```sh
