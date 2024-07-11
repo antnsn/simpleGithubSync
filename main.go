@@ -47,6 +47,13 @@ func setupSSH() error {
 }
 
 func syncRepo(repoDir string) {
+    // Mark the directory as safe for Git
+    configCmd := exec.Command("git", "config", "--global", "--add", "safe.directory", repoDir)
+    if err := configCmd.Run(); err != nil {
+        log.Printf("Failed to mark directory as safe in %s: %v", repoDir, err)
+        return
+    }
+
     cmd := exec.Command("git", "fetch", "origin")
     cmd.Dir = repoDir
     output, err := cmd.CombinedOutput()
@@ -113,8 +120,6 @@ func syncRepo(repoDir string) {
 
     log.Printf("Successfully synced %s", repoDir)
 }
-
-
 
 func main() {
     err := setupSSH()
