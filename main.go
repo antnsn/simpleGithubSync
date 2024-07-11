@@ -26,21 +26,9 @@ func getMountedVolumes() ([]string, error) {
 }
 
 func setupSSH() error {
-    sshKey := os.Getenv("SSH_KEY")
-    if sshKey == "" {
-        return fmt.Errorf("SSH_KEY environment variable not set")
-    }
-
     sshDir := "/root/.ssh"
-    err := os.MkdirAll(sshDir, 0700)
-    if err != nil {
-        return fmt.Errorf("failed to create .ssh directory: %v", err)
-    }
-
-    keyPath := filepath.Join(sshDir, "id_rsa")
-    err = ioutil.WriteFile(keyPath, []byte(sshKey), 0600)
-    if err != nil {
-        return fmt.Errorf("failed to write SSH key: %v", err)
+    if _, err := os.Stat(filepath.Join(sshDir, "id_rsa")); os.IsNotExist(err) {
+        return fmt.Errorf("SSH key not found in %s", sshDir)
     }
 
     // Add GitHub to known hosts to avoid manual fingerprint verification
