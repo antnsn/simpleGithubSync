@@ -22,9 +22,11 @@ FROM alpine:latest
 # Install git and openssh
 RUN apk add --no-cache git openssh
 
-# Set environment variables for directories and SSH key
-ENV FOLDER_PATHS="" \
-    SSH_KEY=""
+# Create a directory for mounting volumes
+RUN mkdir /mnt
+
+# Set environment variables for SSH key
+ENV SSH_KEY=""
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main /usr/local/bin/main

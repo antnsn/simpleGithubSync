@@ -7,13 +7,23 @@ import (
     "os/exec"
     "strings"
     "time"
+    "io/ioutil"
+    "path/filepath"
 )
 
-var repoDirs []string
-
-func init() {
-    paths := os.Getenv("FOLDER_PATHS")
-    repoDirs = strings.Split(paths, ",")
+// Function to get mounted volumes
+func getMountedVolumes() ([]string, error) {
+    var volumes []string
+    files, err := ioutil.ReadDir("/mnt")
+    if err != nil {
+        return nil, err
+    }
+    for _, file := range files {
+        if file.IsDir() {
+            volumes = append(volumes, filepath.Join("/mnt", file.Name()))
+        }
+    }
+    return volumes, nil
 }
 
 func syncRepo(repoDir string) {
@@ -76,6 +86,11 @@ func syncRepo(repoDir string) {
 
 func main() {
     for {
+        repoDirs, err := getMountedVolumes()
+        if err != nil {
+            log.Fatalf("Failed to get mounted volumes: %v", err)
+        }
+        
         for _, repoDir := range repoDirs {
             syncRepo(repoDir)
         }
