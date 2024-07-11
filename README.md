@@ -1,97 +1,104 @@
+### README.md
+
+```markdown
 # Simple GitHub Sync
 
-This project provides a Docker container that monitors multiple directories for changes and syncs them with a remote Git repository. The container periodically checks for changes in the local directories and the remote repository, ensuring both are in sync.
+This project provides a simple solution to sync multiple Git repositories using Docker. It periodically fetches, pulls, commits, and pushes changes to ensure all repositories are up-to-date.
 
-## Features
+## Usage
 
-- Monitors multiple directories for changes.
-- Adds, commits, and pushes changes to a remote Git repository.
-- Pulls changes from the remote repository if there are updates.
-- Configurable via environment variables.
-- Automatically uses all mounted volumes as Git repository paths.
+To use this Docker container, follow the steps below:
 
-## Prerequisites
+### Prerequisites
 
 - Docker installed on your system.
-- A Git repository to sync with.
-- SSH key for authentication with the Git repository.
+- SSH keys set up for GitHub access.
+- `.gitconfig` file configured with your Git user name and email.
 
-## Getting Started
+### Docker Compose Configuration
 
-### Using the Pre-built Image
-
-The Docker image for this project is available on GitHub Container Registry (GHCR) with the `main` tag.
-
-### Running with `docker run`
-
-Run the Docker container with the following volumes:
-
-- Mount the SSH key and known hosts file to the container.
-- Mount the directories you want to monitor to `/repos`.
-
-Example command:
-
-```sh
-docker run -d \
-    -v /path/to/your/.ssh:/root/.ssh \
-    -v /path/to/your/repo1:/repos/repo1 \
-    ghcr.io/antnsn/simplegithubsync:main
-```
-
-### Running with `docker-compose`
-
-Create a `docker-compose.yml` file in your project directory:
+Here is an example of a `docker-compose.yml` configuration:
 
 ```yaml
 version: "3.9"
-
 services:
   simplegithubsync:
     container_name: githubSync
+    environment:
+      - TZ=Europe/Oslo
     volumes:
       - /path/to/your/.ssh:/root/.ssh
-      - /path/to/your/repo1:/repos/repo1
-      - /path/to/your/repo2:/repos/repo2
-    image: ghcr.io/antnsn/simplegithubsync:main
+      - /path/to/your/home:/root
+      - /path/to/repo/repo1:/repos/repo1
+      - /path/to/repo/repo2:/repos/repo2
+    image: ghcr.io/antnsn/simplegithubsync:v1.0.3
+networks: {}
 ```
 
-Run the Docker Compose setup:
+### Docker Run Command
+
+If you prefer to use `docker run` instead of Docker Compose, you can use the following command:
+
+```sh
+docker run -d \
+  --name githubSync \
+  -e TZ=Europe/Oslo \
+  -v /path/to/your/.ssh:/root/.ssh \
+  -v /path/to/your/home:/root \
+  -v /path/to/repo/repo1:/repos/repo1 \
+  -v /path/to/repo/repo2:/repos/repo2 \
+  ghcr.io/antnsn/simplegithubsync:v1.0.3
+```
+
+### Configuration
+
+1. **SSH Keys**: Mount your SSH keys directory to `/root/.ssh` inside the container. Ensure your SSH keys have the correct permissions.
+
+   ```yaml
+   - /path/to/your/.ssh:/root/.ssh
+   ```
+
+2. **Git Configuration**: Mount your home directory containing the `.gitconfig` file to `/root` inside the container.
+
+   ```yaml
+   - /path/to/your/home:/root
+   ```
+
+3. **Repositories**: Mount each of your Git repositories to `/repos` inside the container. Each repository should be in its own directory.
+
+   ```yaml
+   - /path/to/repo/repo1:/repos/repo1
+   - /path/to/repo/repo2:/repos/repo2
+   ```
+
+### Running the Container
+
+To run the container using Docker Compose, navigate to the directory containing your `docker-compose.yml` file and execute:
 
 ```sh
 docker-compose up -d
 ```
 
+This will start the `simplegithubsync` container in detached mode. The container will periodically sync your repositories according to the script logic.
+
+To run the container using `docker run`, execute the command provided in the Docker Run Command section.
+
 ### Environment Variables
 
-This setup does not require environment variables for the SSH key because the key is mounted directly as a volume.
+- `TZ`: Set the timezone for the container (e.g., `Europe/Oslo`).
 
-### How It Works
+### Logging
 
-1. The entrypoint script sets up the SSH key for authentication.
-2. The script lists all directories mounted to `/repos` and uses them as Git repository paths.
-3. If changes are detected locally, it adds, commits, and pushes the changes to the remote repository.
-4. If changes are detected in the remote repository, it pulls the updates to the local directories.
-5. The script runs in an infinite loop, checking for changes every 60 seconds.
+Logs for the synchronization process will be available in the Docker container's logs. You can view them using:
 
-### Troubleshooting
+```sh
+docker logs -f githubSync
+```
 
-- Ensure the SSH key has the correct permissions:
+### Contributing
 
-  ```sh
-  chmod 600 /path/to/your/private/key
-  ```
-
-- Verify that the directories mounted to `/repos` exist and are accessible.
-- Check the logs of the Docker container for any error messages:
-
-  ```sh
-  docker logs githubSync
-  ```
+Feel free to open issues or submit pull requests if you have suggestions for improvements or bug fixes.
 
 ### License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-This `README.md` provides clear instructions for running the Docker container using the pre-built image from GHCR with the `main` tag and dynamically using all mounted volumes as Git repository paths, with generic paths for easier adaptation.
