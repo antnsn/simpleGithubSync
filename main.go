@@ -1,13 +1,13 @@
 package main
 
 import (
-    "fmt"
-    "io/ioutil"
-    "log"
-    "os"
-    "os/exec"
-    "path/filepath"
-    "time"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"time"
 )
 
 // Function to get mounted volumes
@@ -48,10 +48,10 @@ func setupSSH() error {
 
 func syncRepo(repoDir string) {
     // Mark the directory as safe for Git using --system instead of --global
-    configCmd := exec.Command("git", "config", "--system", "--add", "safe.directory", "*")
+    configCmd := exec.Command("git", "config", "--system", "--add", "safe.directory", repoDir)
     if err := configCmd.Run(); err != nil {
-        log.Printf("Failed to mark directories as safe: %v", err)
-        // Continue execution even if marking as safe fails
+        log.Printf("Failed to mark directory as safe in %s: %v", repoDir, err)
+        return
     }
 
     cmd := exec.Command("git", "fetch", "origin")
